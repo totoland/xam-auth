@@ -33,7 +33,7 @@ namespace UISampleApp.Views.SignUps
                 password = "password"
             };
 
-            ResponseCode resp = await regService.CreateUserAccount(model);
+            ResponseCode resp = await regService.Login(model);
 
             if (resp.RespCode == "200")
             {

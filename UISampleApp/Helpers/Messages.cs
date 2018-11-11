@@ -10,6 +10,6 @@ namespace Helpers.Messages
 {
     public class Messages
     {
-        public static readonly IMessage message = DependencyService.Get<IMessage>();
+        public static readonly IMessage Toast = DependencyService.Get<IMessage>();
     }
 }

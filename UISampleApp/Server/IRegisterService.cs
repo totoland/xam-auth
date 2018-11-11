@@ -9,6 +9,7 @@ namespace UISampleApp.Server
 {
     public interface IRegisterService
     {
+        Task<ResponseCode> Login(UserInfo user);
         Task<ResponseCode> CreateUserAccount(UserInfo user);
     }
 }

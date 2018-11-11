@@ -2,7 +2,12 @@
 using Helpers.Settings;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UISampleApp.Effects;
+using UISampleApp.Models;
+using UISampleApp.Models.Commons;
+using UISampleApp.Server;
+using UISampleApp.Views.CheckIn;
 using UISampleApp.Views.ForgotPasswords;
 using UISampleApp.Views.SignUps;
 using Xamarin.Forms;
@@ -27,9 +32,30 @@ namespace UISampleApp.Logins
             await Navigation.PushModalAsync(new ForgotPassword());
         }
 
-        private void LoginClicked(object sender, EventArgs e)
+        private async void HandleLogin(object sender, EventArgs e)
         {
-            Messages.message.ShowMessage(Settings.TokenId);
+            var message = DependencyService.Get<IMessage>();
+
+            var regService = DependencyService.Get<IRegisterService>();
+            var model = new UserInfo
+            {
+                username = Email.Text,
+                password = Password.Text
+            };
+
+            ResponseCode resp = await regService.Login(model);
+
+            if (resp.RespCode == ResponseCode.SUCCESS)
+            {
+                message.ShowMessage("Login successfuly");
+                Settings.TokenId = ((UserInfo)resp.Data).token;
+                await Navigation.PushModalAsync(new CheckIn());
+            }
+            else
+            {
+                message.ShowMessage(resp.RespCode);
+            }
+
         }
     }
 }

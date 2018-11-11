@@ -19,9 +19,81 @@ namespace UISampleApp.Server
     {
         private readonly string tag = "RegisterServices";
         private readonly IMessage message = DependencyService.Get<IMessage>();
-        private readonly string serverEndpoint = "http://192.168.1.34:9000/auth/login";
+        private readonly string _authenEnpoint = "http://192.168.1.34:9000/auth/login";
+        private readonly string _registerEndpoint = "http://192.168.1.34:9000/auth/login";
 
+        public async Task<ResponseCode> Login(UserInfo user)
+        {
+            var client = new HttpClient
+            {
+                //Set timeout
+                Timeout = TimeSpan.FromSeconds(10)
+            };
 
+            var model = new UserInfo
+            {
+                username = user.username,
+                password = user.password
+            };
+
+            var responseCode = new ResponseCode
+            {
+                RespCode = ResponseCode.SUCCESS
+            };
+
+            var json = JsonConvert.SerializeObject(model);
+
+            try
+            {
+                HttpContent httpContent = new StringContent(json);
+
+                httpContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                var response = await client.PostAsync(_registerEndpoint, httpContent);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    message.Debug(tag, "response not success");
+                    responseCode = new ResponseCode
+                    {
+                        RespCode = response.StatusCode.ToString()
+                    };
+                    return responseCode;
+                }
+
+                message.Debug(tag, response.RequestMessage.ToString());
+
+                var content = await response.Content.ReadAsStringAsync();
+                UserInfo respUser = JsonConvert.DeserializeObject<UserInfo>(content);
+
+                #region user not found
+                if (respUser == null)
+                {
+                    responseCode = new ResponseCode
+                    {
+                        RespCode = ResponseCode.NOT_FOUND
+                    };
+                    return responseCode;
+                }
+                #endregion
+
+                responseCode.Data = respUser;
+
+                return responseCode;
+            }
+            catch (Exception e)
+            {
+                message.Debug(tag, e.ToString());
+                responseCode = new ResponseCode
+                {
+                    RespCode = ResponseCode.SERVICE_UNAVAILABLE,
+                    RespDesc = e.Message
+                };
+            }
+
+            return responseCode;
+        }
+    
         public async Task<ResponseCode> CreateUserAccount(UserInfo user)
         {
             var client = new HttpClient
@@ -49,7 +121,7 @@ namespace UISampleApp.Server
 
                 httpContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-                var response = await client.PostAsync(serverEndpoint, httpContent);
+                var response = await client.PostAsync(_registerEndpoint, httpContent);
                 
                 if (!response.IsSuccessStatusCode)
                 {

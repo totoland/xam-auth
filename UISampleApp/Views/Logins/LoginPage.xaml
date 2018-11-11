@@ -25,6 +25,7 @@
                 
                  <Entry  Margin="20,40,20,0" 
                          HeightRequest="50" 
+                         x:Name="Email"
                          Placeholder="Email">
                     <Entry.Effects>
                         <local:BackgroundEntryEffect />
@@ -32,7 +33,9 @@
                  </Entry>
                 
                  <Entry Margin="20,0,20,0" 
-                        HeightRequest="50" IsPassword="true"
+                        HeightRequest="50" 
+                        IsPassword="true"
+                        x:Name="Password"
                         Placeholder="Password">
                     <Entry.Effects>
                         <local:BackgroundEntryEffect />
@@ -45,7 +48,7 @@
                          Text="Login"  
                          StyleClass="primary"
                          HorizontalOptions="FillAndExpand"
-                         Clicked="LoginClicked"/>
+                         Clicked="HandleLogin"/>
                 
                  <Button Margin="20,0,20,0" 
                          HeightRequest="50" 
